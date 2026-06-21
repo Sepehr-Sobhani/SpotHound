@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: spothound
+      POSTGRES_PASSWORD: spothound
+      POSTGRES_DB: spothound
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg2://spothound:spothound@db:5432/spothound
+      JWT_SECRET: change-me-in-prod
+      HEADLESS: "true"
+    ports:
+      - "8000:8000"
+    profiles: ["full"]   # `docker compose up db` for local dev; add --profile full for the whole stack
+
+volumes:
+  pgdata:
