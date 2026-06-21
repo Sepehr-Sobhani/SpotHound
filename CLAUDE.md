@@ -83,10 +83,15 @@ backend/
     seed.py          # create admin + sync spots + subscribe admin
   selftest.py        # run spots through the engine, no DB needed
   Dockerfile         # python + uv + chromium + xvfb
+frontend/            # Vite + React + TS + Tailwind UI (api.ts, auth, pages/)
 docker-compose.yml   # local Postgres (service `db`)
 Makefile             # make targets wrapping the commands below
-docs/                # ADDING_A_SPOT.md, ROADMAP.md
+docs/                # ADDING_A_SPOT.md, ROADMAP.md, PLAN.md
 ```
+
+Frontend talks to the API via `VITE_API_URL` (default `http://127.0.0.1:8000`);
+JWT is stored in localStorage. `api.ts` is the typed client; `auth.tsx` holds
+the session. Run with `make web` (Vite on :5173).
 
 ## Conventions (important)
 

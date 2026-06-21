@@ -24,9 +24,14 @@ What's done. Detailed plan for the remaining phases is in `PLAN.md`.
   rendered per-target from `target_date`; one recipe covers any date.
 - `docs/ADDING_A_SPOT.md` documents the repeatable "add a site" workflow.
 
+### Phase 2 — React + Tailwind UI ✅
+- Vite + React + TS + Tailwind in `frontend/`. JWT login, targets dashboard with
+  status + on/off toggles, target detail (date picker, interval, active window,
+  subscribers, live Test button, read-only check logic), and an admin area
+  (user management, spot catalog, sync). `GET /targets/{id}` added to the API.
+
 ## Next
 
-- Phase 2 — React + Tailwind UI (current focus)
 - Phase 3 — scheduling & notifications polish
 - Phase 4 — deploy (Vercel + Neon + Oracle VM)
 

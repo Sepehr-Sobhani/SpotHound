@@ -3,7 +3,10 @@
 Detailed, resumable plan for the phases after the backend. High-level status
 lives in `ROADMAP.md`; architecture in `CLAUDE.md`.
 
-## Phase 2 — React + Tailwind UI
+## Phase 2 — React + Tailwind UI ✅ done
+
+Implemented in `frontend/` (login, dashboard, target detail, admin). Telegram
+onboarding and an events feed remain — moved to Phase 3.
 
 Goal: a usable web UI for managing targets, backed by the existing API.
 

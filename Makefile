@@ -1,6 +1,7 @@
-.PHONY: help db db-down install seed dev test selftest reset
+.PHONY: help db db-down install seed dev test selftest reset web-install web
 
 BACKEND = backend
+FRONTEND = frontend
 DB_CONTAINER = spothound-db-1
 
 help:  ## Show available targets
@@ -29,5 +30,11 @@ test:  ## Run every spot through the engine (no DB needed)
 
 selftest:  ## Run one spot: make selftest spot=<spot_key>
 	cd $(BACKEND) && uv run python selftest.py $(spot)
+
+web-install:  ## Install frontend dependencies (npm)
+	cd $(FRONTEND) && npm install
+
+web:  ## Run the frontend dev server (Vite on :5173)
+	cd $(FRONTEND) && npm run dev
 
 reset: db-down db seed  ## Recreate the DB from scratch and reseed
