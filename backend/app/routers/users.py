@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..deps import get_current_user, require_admin
 from ..models import User
-from ..schemas import UserCreate, UserOut
+from ..notify import send_telegram
+from ..schemas import MeUpdate, UserCreate, UserOut
 from ..security import hash_password
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -36,3 +37,25 @@ def create_user(
 @router.get("/me", response_model=UserOut)
 def me(user: User = Depends(get_current_user)):
     return user
+
+
+@router.patch("/me", response_model=UserOut)
+def update_me(
+    payload: MeUpdate, db: Session = Depends(get_db), user: User = Depends(get_current_user)
+):
+    user.telegram_chat_id = payload.telegram_chat_id or None
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@router.post("/me/telegram/test")
+def test_my_telegram(user: User = Depends(get_current_user)):
+    if not user.telegram_chat_id:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Set your Telegram chat id first")
+    if not send_telegram(user.telegram_chat_id, "🐕 SpotHound test — notifications are working!"):
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Could not send. Check the bot token and that you've messaged the bot.",
+        )
+    return {"sent": True}

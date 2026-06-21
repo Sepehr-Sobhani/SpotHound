@@ -41,3 +41,22 @@ export interface Spot {
   url: string;
   headless: boolean;
 }
+
+export interface TelegramStatus {
+  configured: boolean;
+  username: string | null;
+}
+
+export interface ChatUpdate {
+  chat_id: string;
+  name: string;
+  text: string;
+}
+
+export interface EventItem {
+  id: number;
+  timestamp: string;
+  status: string;
+  observed: string | null;
+  notified: boolean;
+}

@@ -30,9 +30,16 @@ What's done. Detailed plan for the remaining phases is in `PLAN.md`.
   subscribers, live Test button, read-only check logic), and an admin area
   (user management, spot catalog, sync). `GET /targets/{id}` added to the API.
 
+### Phase 3 — Notifications & activity ✅
+- Telegram onboarding: a Settings page to set your chat id and send a test,
+  bot status (`getMe`), and admin chat-id discovery (`getUpdates`). Endpoints:
+  `GET /telegram/status`, `GET /telegram/updates`, `PATCH /users/me`,
+  `POST /users/me/telegram/test`.
+- Activity feed: `GET /targets/{id}/events` and an Activity card showing recent
+  check history (status, observed, notified).
+
 ## Next
 
-- Phase 3 — scheduling & notifications polish
 - Phase 4 — deploy (Vercel + Neon + Oracle VM)
 
 See `PLAN.md` for the detailed task breakdown.

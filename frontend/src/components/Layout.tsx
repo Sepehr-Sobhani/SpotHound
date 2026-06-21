@@ -28,6 +28,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             </Link>
             <nav className="flex items-center gap-4">
               {navLink("/", "Targets")}
+              {navLink("/settings", "Settings")}
               {user?.role === "admin" && navLink("/admin", "Admin")}
             </nav>
           </div>

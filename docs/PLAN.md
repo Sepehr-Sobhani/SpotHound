@@ -36,16 +36,15 @@ Decisions / notes:
 Done when: an admin can log in, set a target's date, schedule it, manage
 subscribers, run a live test, and toggle it on — all from the browser.
 
-## Phase 3 — Scheduling & notifications polish
+## Phase 3 — Notifications & activity ✅ done
 
-Tasks:
-- Telegram onboarding: capture each user's `telegram_chat_id` (instructions +
-  bot `getUpdates`, or a "send test message" button to verify).
-- Events feed: endpoint + UI to show recent `events` per target (history of
-  checks and notifications).
-- Active-window UX and validation; optional re-notify cadence and quiet hours.
-- Confirm multi-recipient notifications end to end (subscriptions already model
-  this).
+Done: Telegram onboarding (Settings page: set chat id, send test; bot status via
+`getMe`; admin chat-id discovery via `getUpdates`) and the per-target activity
+feed (`GET /targets/{id}/events` + Activity card).
+
+Still optional / deferred:
+- Active-window validation; re-notify cadence and quiet hours.
+- A global activity feed across all targets.
 
 ## Phase 4 — Deploy (all free)
 

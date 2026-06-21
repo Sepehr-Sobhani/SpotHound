@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, SessionLocal, engine
-from .routers import admin, auth, targets, users
+from .routers import admin, auth, targets, telegram, users
 from .scheduler import scheduler, start_scheduler
 from .sync import sync_spots
 
@@ -35,6 +35,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(targets.router)
+app.include_router(telegram.router)
 app.include_router(admin.router)
 
 

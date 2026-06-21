@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../auth";
-import type { CheckResult, Subscriber, Target, User } from "../types";
+import type { CheckResult, EventItem, Subscriber, Target, User } from "../types";
 import {
   Button,
   Card,
@@ -23,6 +23,7 @@ export default function TargetDetail() {
   const [target, setTarget] = useState<Target | null>(null);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [test, setTest] = useState<CheckResult | null>(null);
@@ -32,6 +33,7 @@ export default function TargetDetail() {
   useEffect(() => {
     api.getTarget(targetId).then(setTarget).catch((e) => setError(e.message));
     api.listSubscribers(targetId).then(setSubscribers).catch(() => {});
+    api.listEvents(targetId).then(setEvents).catch(() => {});
     if (user?.role === "admin") api.listUsers().then(setUsers).catch(() => {});
   }, [targetId, user]);
 
@@ -263,6 +265,34 @@ export default function TargetDetail() {
               ))}
             </select>
           </div>
+        )}
+      </Card>
+
+      <Card>
+        <h2 className="mb-3 font-semibold">Activity</h2>
+        {events.length === 0 ? (
+          <p className="text-sm text-slate-400">
+            No checks yet. Enable the target (or run a test) to see history here.
+          </p>
+        ) : (
+          <ul className="divide-y divide-slate-700/60 text-sm">
+            {events.map((ev) => (
+              <li key={ev.id} className="flex items-center justify-between gap-3 py-2">
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={ev.status} />
+                  {ev.notified && (
+                    <span className="text-xs text-indigo-400">notified</span>
+                  )}
+                  <span className="truncate text-slate-500" title={ev.observed ?? ""}>
+                    {ev.observed}
+                  </span>
+                </div>
+                <span className="shrink-0 text-xs text-slate-500">
+                  {new Date(ev.timestamp).toLocaleString()}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
       </Card>
 

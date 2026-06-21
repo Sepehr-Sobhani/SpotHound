@@ -66,6 +66,31 @@ class SubscriberOut(BaseModel):
     username: str
 
 
+class MeUpdate(BaseModel):
+    telegram_chat_id: str | None = None
+
+
+class EventOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    timestamp: dt.datetime
+    status: str
+    observed: str | None = None
+    notified: bool
+
+
+class TelegramStatus(BaseModel):
+    configured: bool
+    username: str | None = None
+
+
+class ChatUpdate(BaseModel):
+    chat_id: str
+    name: str
+    text: str
+
+
 class CheckResult(BaseModel):
     met: bool
     observed: str | None = None

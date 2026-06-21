@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..deps import get_current_user, require_admin
 from ..engine import run_check
-from ..models import Subscription, Target, User
-from ..schemas import CheckResult, SubscriberOut, TargetOut, TargetUpdate
+from ..models import Event, Subscription, Target, User
+from ..schemas import CheckResult, EventOut, SubscriberOut, TargetOut, TargetUpdate
 from ..scheduler import reload_jobs
 from ..spots.render import has_unresolved, render
 
@@ -64,6 +64,20 @@ def toggle_target(
     db.refresh(target)
     reload_jobs()
     return target
+
+
+@router.get("/{target_id}/events", response_model=list[EventOut])
+def list_events(
+    target_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)
+):
+    _get_target(db, target_id)
+    return (
+        db.query(Event)
+        .filter(Event.target_id == target_id)
+        .order_by(Event.timestamp.desc())
+        .limit(20)
+        .all()
+    )
 
 
 @router.post("/{target_id}/test", response_model=CheckResult)

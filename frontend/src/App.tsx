@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import TargetDetail from "./pages/TargetDetail";
 import Admin from "./pages/Admin";
+import Settings from "./pages/Settings";
 import type { ReactNode } from "react";
 
 function Protected({ children, admin }: { children: ReactNode; admin?: boolean }) {
@@ -38,6 +39,14 @@ export default function App() {
         element={
           <Protected>
             <TargetDetail />
+          </Protected>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <Protected>
+            <Settings />
           </Protected>
         }
       />

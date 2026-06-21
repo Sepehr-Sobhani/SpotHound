@@ -1,8 +1,11 @@
 import type {
+  ChatUpdate,
   CheckResult,
+  EventItem,
   Spot,
   Subscriber,
   Target,
+  TelegramStatus,
   User,
 } from "./types";
 
@@ -60,8 +63,16 @@ export const api = {
   logout: () => tokenStore.clear(),
 
   me: () => request<User>("/users/me"),
+  updateMe: (telegram_chat_id: string | null) =>
+    request<User>("/users/me", jsonBody("PATCH", { telegram_chat_id })),
+  testMyTelegram: () =>
+    request<{ sent: boolean }>("/users/me/telegram/test", { method: "POST" }),
+
+  telegramStatus: () => request<TelegramStatus>("/telegram/status"),
+  telegramUpdates: () => request<ChatUpdate[]>("/telegram/updates"),
 
   listTargets: () => request<Target[]>("/targets"),
+  listEvents: (id: number) => request<EventItem[]>(`/targets/${id}/events`),
   getTarget: (id: number) => request<Target>(`/targets/${id}`),
   updateTarget: (id: number, patch: Partial<Target>) =>
     request<Target>(`/targets/${id}`, jsonBody("PATCH", patch)),
