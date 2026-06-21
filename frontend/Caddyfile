@@ -1,0 +1,15 @@
+# SITE_ADDRESS=:80 serves over HTTP (use the server IP). Set it to a domain
+# (e.g. spothound.example.com) and Caddy gets a Let's Encrypt cert automatically.
+{$SITE_ADDRESS::80} {
+	encode gzip
+
+	handle_path /api/* {
+		reverse_proxy backend:8000
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

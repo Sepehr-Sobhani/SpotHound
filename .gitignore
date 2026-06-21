@@ -10,6 +10,9 @@ dist/
 .vite/
 *.tsbuildinfo
 
+# Production env (real secrets)
+.env.prod
+
 # Misc
 .DS_Store
 *.log
