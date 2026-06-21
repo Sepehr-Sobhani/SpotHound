@@ -22,8 +22,15 @@ class SpotDefinition:
     name: str
 
     url: str
+
+    # steps/condition may contain {date:<strftime>} tokens (e.g.
+    # {date:%A, %B %-d, %Y}); they're rendered per-target with the target's date.
     steps: list[dict[str, Any]]
     condition: dict[str, Any]
+
+    # Whether this spot needs a target_date to render its tokens. A dated target
+    # won't run until its date is set.
+    requires_date: bool = True
 
     # Used only when the target row is first created; users tune it afterwards.
     default_interval_seconds: int = 300

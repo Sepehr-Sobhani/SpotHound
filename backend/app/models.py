@@ -4,6 +4,7 @@ from sqlalchemy import (
     JSON,
     Boolean,
     Column,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -43,6 +44,7 @@ class Target(Base):
     headless = Column(Boolean, nullable=False, default=True)
 
     # --- user-owned: editable in the UI, never overwritten by a spot sync ---
+    target_date = Column(Date, nullable=True)  # the date this target watches
     interval_seconds = Column(Integer, nullable=False, default=300)
 
     # optional active window; null active_days = every day

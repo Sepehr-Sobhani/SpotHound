@@ -14,6 +14,7 @@ from ..engine import run_check
 from ..models import Subscription, Target, User
 from ..schemas import CheckResult, SubscriberOut, TargetOut, TargetUpdate
 from ..scheduler import reload_jobs
+from ..spots.render import has_unresolved, render
 
 router = APIRouter(prefix="/targets", tags=["targets"])
 
@@ -65,8 +66,12 @@ async def test_target(
 ):
     """Run the check right now and return what it observed — the live 'Test' button."""
     target = _get_target(db, target_id)
+    steps = render(target.steps, target.target_date)
+    condition = render(target.condition, target.target_date)
+    if has_unresolved(steps) or has_unresolved(condition):
+        return CheckResult(met=False, error="target_date is not set")
     result = await run_in_threadpool(
-        run_check, target.url, target.steps, target.condition, target.headless
+        run_check, target.url, steps, condition, target.headless
     )
     return CheckResult(**result)
 

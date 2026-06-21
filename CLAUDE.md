@@ -24,7 +24,15 @@ Field ownership on a `Target` (`backend/app/models.py`):
 
 | Definition-owned (synced from the spot, read-only in UI) | User-owned (editable in UI) |
 |---|---|
-| `name`, `url`, `steps`, `condition`, `headless` | `enabled`, `interval_seconds`, `active_days`, `active_start`, `active_end`, subscriptions |
+| `name`, `url`, `steps`, `condition`, `headless` | `target_date`, `enabled`, `interval_seconds`, `active_days`, `active_start`, `active_end`, subscriptions |
+
+**Dates are parameters, never hardcoded.** A spot's selectors use
+`{date:<strftime>}` tokens (e.g. `{date:%A, %B %-d, %Y}` →
+"Sunday, June 21, 2026"); each target supplies its own `target_date`, rendered
+into the steps/condition just before a check by `app/spots/render.py`. So one
+spot recipe monitors any date — the user just sets/changes the target's date. A
+target whose tokens can't be filled (no date set) reports `needs_date` and is
+skipped.
 
 `app/sync.py::sync_spots` upserts definition-owned fields and **never** overwrites
 user-owned ones. New targets are created **disabled**. Sync runs on startup and

@@ -16,24 +16,25 @@ Enterprise**. So:
     SpotHound just detects the open slot and notifies; the human books.
   * Poll gently (every few minutes) so we don't trip rate limiting.
 
-Flow: load page -> click the date button (`aria-label="Sunday 21"`) -> read the
-"Add To Cart" link. It carries class `btn-disbled` (sic) and
-`aria-disabled="true"` while full; both clear when a pass is available -> our
-"enabled" condition (the engine treats the misspelled class as disabled too).
+Flow: load page -> click the date button -> read the "Add To Cart" link. It
+carries class `btn-disbled` (sic) and `aria-disabled="true"` while full; both
+clear when a pass is available -> our "enabled" condition (the engine treats the
+misspelled class as disabled too).
 
-Fragility: the date button's aria-label is date-specific ("Sunday 21").
+The date is a per-target parameter: the date button's aria-label is rendered
+from the target's date via `{date:%A %-d}` -> "Sunday 21".
 """
 from .base import SpotDefinition
 
 SPOT = SpotDefinition(
     key="buntzen_lake_all_day",
-    name="Buntzen Lake — All Day Pass (Sun Jun 21)",
+    name="Buntzen Lake — All Day Pass",
     url="https://yodelportal.com/buntzen-lake/All-Day-Pass",
     headless=False,
     default_interval_seconds=300,
     steps=[
         {"action": "wait", "ms": 4000},
-        {"action": "click", "selector": 'button[aria-label="Sunday 21"]'},
+        {"action": "click", "selector": 'button[aria-label="{date:%A %-d}"]'},
         {"action": "wait", "ms": 2500},
     ],
     condition={"selector": 'a:has-text("Add To Cart")', "check": "enabled"},

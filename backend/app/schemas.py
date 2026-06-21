@@ -42,6 +42,7 @@ class TargetUpdate(BaseModel):
     """User-editable fields only. The check logic (url/steps/condition/headless)
     is defined in code (app/spots/) and is never editable through the API."""
 
+    target_date: dt.date | None = None
     interval_seconds: int | None = None
     active_days: list[int] | None = None
     active_start: str | None = None
@@ -54,6 +55,7 @@ class TargetOut(TargetBase):
 
     id: int
     spot_key: str | None = None
+    target_date: dt.date | None = None
     last_checked_at: dt.datetime | None = None
     last_status: str | None = None
     last_observed: str | None = None

@@ -70,6 +70,18 @@ detection → the spot must use `headless=False`.
 | `fill` | `selector`, `text` | type into an input |
 | `wait` | `ms` *or* `selector` | pause, or wait for an element |
 
+**Dates are parameters — never hardcode them.** If a selector includes a date,
+write it as a `{date:<strftime>}` token; the target's `target_date` is rendered
+in at runtime, so one spot covers every date:
+
+| site shows | token | renders (for 2026-06-21) |
+|---|---|---|
+| `aria-label="Sunday, June 21, 2026"` | `{date:%A, %B %-d, %Y}` | Sunday, June 21, 2026 |
+| `aria-label="Sunday 21"` | `{date:%A %-d}` | Sunday 21 |
+
+(Use `%-d` for a day with no leading zero.) Set `requires_date=False` only if the
+spot has no date at all. A target with unfilled tokens reports `needs_date`.
+
 **Condition** — the single thing that means "available now":
 
 | check | meaning |

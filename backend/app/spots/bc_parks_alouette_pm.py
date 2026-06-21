@@ -16,14 +16,18 @@ uniform engine. The booking flow:
 The PM radio (`#visitTimePM`) carries the native `disabled` attribute while the
 slot is Full; it loses it when a pass opens -> that's our condition.
 
-Fragility: the date selector is date-specific (`aria-label="Sunday, June 21,
-2026"`). Update `steps` when targeting a different day.
+The date is a per-target parameter: the calendar cell's aria-label is rendered
+from the target's date via `{date:%A, %B %-d, %Y}` -> "Sunday, June 21, 2026".
+
+Limitation: the date picker opens on the current month, so this assumes the
+target date is in the visible month. Far-future dates would need extra "next
+month" click steps.
 """
 from .base import SpotDefinition
 
 SPOT = SpotDefinition(
     key="bc_parks_alouette_pm",
-    name="BC Parks — Alouette South Beach PM (Sun Jun 21)",
+    name="BC Parks — Alouette South Beach PM",
     url="https://reserve.bcparks.ca/dayuse/",
     headless=True,
     default_interval_seconds=60,
@@ -32,7 +36,7 @@ SPOT = SpotDefinition(
         {"action": "wait", "ms": 1500},
         {"action": "click", "selector": 'button[title="Select a Date"]'},
         {"action": "wait", "ms": 800},
-        {"action": "click", "selector": 'div[aria-label="Sunday, June 21, 2026"]'},
+        {"action": "click", "selector": 'div[aria-label="{date:%A, %B %-d, %Y}"]'},
         {"action": "wait", "ms": 800},
         {"action": "select", "selector": "select", "label": "Alouette Lake South Beach Day-Use Parking Lot - Parking"},
         {"action": "wait", "ms": 2000},

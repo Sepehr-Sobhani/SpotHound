@@ -20,6 +20,8 @@ Where SpotHound is and what's next. Keep this current.
   disabled.
 - API restricted: no create/delete of check logic via API; users only manage
   scheduling, on/off, and subscriptions. Admin can `POST /admin/sync-spots`.
+- **Dates are parameters, not hardcoded** — spots use `{date:<strftime>}` tokens
+  rendered per-target from `target_date`; one recipe covers any date.
 - `docs/ADDING_A_SPOT.md` documents the repeatable "add a site" workflow.
 
 ## Next
