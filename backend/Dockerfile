@@ -13,13 +13,14 @@ RUN uv sync --frozen --no-dev
 COPY . .
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Chromium + its OS deps, plus xvfb for a virtual display
+# Chromium + its OS deps, plus xvfb/xauth for a virtual display
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends xvfb \
+    && apt-get install -y --no-install-recommends xvfb xauth \
     && playwright install --with-deps chromium \
     && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 8000
 
-# xvfb-run gives any headful browser a display to attach to
-CMD ["xvfb-run", "-a", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# entrypoint starts Xvfb (virtual display) then execs the server
+ENTRYPOINT ["sh", "/app/docker-entrypoint.sh"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
