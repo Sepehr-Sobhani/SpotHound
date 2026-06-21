@@ -30,6 +30,13 @@ def list_targets(db: Session = Depends(get_db), _: User = Depends(get_current_us
     return db.query(Target).all()
 
 
+@router.get("/{target_id}", response_model=TargetOut)
+def get_target(
+    target_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)
+):
+    return _get_target(db, target_id)
+
+
 @router.patch("/{target_id}", response_model=TargetOut)
 def update_target(
     target_id: int,
