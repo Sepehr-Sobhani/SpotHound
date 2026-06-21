@@ -4,22 +4,31 @@ Watch any website for a condition and get pinged when it's met. Built originally
 
 ## How it works
 
-Every target is checked the same way: **a real browser (Playwright) opens the page, runs a few steps (clicks/selects), and evaluates a condition.** Because it drives a real browser, it handles everything — plain pages, JSON-API apps, and JavaScript sites with bot detection — through one engine.
+Every check goes through the same path: **a real browser (Playwright) opens the page, runs a few steps (clicks/selects), and evaluates a condition.** Because it drives a real browser, it handles everything — plain pages, JSON-API apps, and JavaScript sites with bot detection — through one engine.
 
-A target is just config you can edit in the UI:
+**Spots vs targets** (see `CLAUDE.md`):
 
-```jsonc
-{
-  "name": "Buntzen Lake — All Day Pass (Sun Jun 21)",
-  "url": "https://yodelportal.com/buntzen-lake/All-Day-Pass",
-  "steps": [
-    { "action": "wait",  "ms": 4000 },
-    { "action": "click", "selector": "button[aria-label=\"Sunday 21\"]" }
-  ],
-  "condition": { "selector": "a:has-text(\"Add To Cart\")", "check": "enabled" },
-  "interval_seconds": 300,
-  "enabled": true
-}
+- A **spot** is a code-defined recipe (URL + steps + condition) living in
+  `backend/app/spots/<key>.py`. Adding one is a developer task — see
+  `docs/ADDING_A_SPOT.md`.
+- A **target** is the DB row that recipe becomes. Users manage targets in the UI
+  — **on/off, scheduling, and who gets notified** — but never the check logic.
+
+A spot module looks like:
+
+```python
+SPOT = SpotDefinition(
+    key="buntzen_lake_all_day",
+    name="Buntzen Lake — All Day Pass (Sun Jun 21)",
+    url="https://yodelportal.com/buntzen-lake/All-Day-Pass",
+    headless=False,                       # site blocks headless browsers
+    default_interval_seconds=300,
+    steps=[
+        {"action": "wait", "ms": 4000},
+        {"action": "click", "selector": 'button[aria-label="Sunday 21"]'},
+    ],
+    condition={"selector": 'a:has-text("Add To Cart")', "check": "enabled"},
+)
 ```
 
 When the condition flips to true, every subscribed user gets a Telegram message.
@@ -35,34 +44,27 @@ When the condition flips to true, every subscribed user gets a Telegram message.
 
 ## Status
 
-- **Phase 1 (this scaffold):** browser engine, target model, scheduler, Telegram, basic auth + CRUD API. ✅
-- **Phase 2:** React + Tailwind UI (target editor with live "Test" button, on/off toggles, user management).
-- **Phase 3:** richer schedules, multi-user notification routing.
-- **Phase 4:** Dockerize + deploy (Vercel + Neon + Oracle VM).
+Phase 1 (backend) and the spots architecture are **done**. Phase 2 (React +
+Tailwind UI) is next. Full detail in `docs/ROADMAP.md`.
 
 ## Local development
 
-```bash
-# 1. start Postgres
-docker compose up -d db
-
-# 2. backend
-cd backend
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-playwright install chromium
-cp .env.example .env          # then edit secrets
-
-# 3. seed admin user + the two reference targets
-python -m app.seed
-
-# 4. run the API + scheduler
-uvicorn app.main:app --reload
-```
-
-Quick engine check without a database:
+Everything is wrapped in the Makefile — `make help` lists targets:
 
 ```bash
-cd backend && source .venv/bin/activate
-python selftest.py            # runs both reference targets through the engine
+make db        # start local Postgres (waits until ready)
+make install   # uv sync
+cp backend/.env.example backend/.env   # then edit secrets
+make seed      # admin user + sync spots into targets (created disabled)
+make dev       # API + scheduler on :8000
+
+make test                                # run all spots through the engine, no DB
+make selftest spot=bc_parks_alouette_pm  # one spot
+make reset                               # wipe DB + reseed
 ```
+
+> Uses **uv** (not pip) and Python 3.13. macOS: run `sudo xcodebuild -license
+> accept` once to enable `make`.
+
+See `CLAUDE.md` for architecture and conventions, and `docs/ADDING_A_SPOT.md` to
+add a new site to monitor.

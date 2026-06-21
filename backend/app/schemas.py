@@ -38,20 +38,14 @@ class TargetBase(BaseModel):
     enabled: bool = True
 
 
-class TargetCreate(TargetBase):
-    pass
-
-
 class TargetUpdate(BaseModel):
-    name: str | None = None
-    url: str | None = None
-    steps: list[dict[str, Any]] | None = None
-    condition: dict[str, Any] | None = None
+    """User-editable fields only. The check logic (url/steps/condition/headless)
+    is defined in code (app/spots/) and is never editable through the API."""
+
     interval_seconds: int | None = None
     active_days: list[int] | None = None
     active_start: str | None = None
     active_end: str | None = None
-    headless: bool | None = None
     enabled: bool | None = None
 
 
@@ -59,9 +53,15 @@ class TargetOut(TargetBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    spot_key: str | None = None
     last_checked_at: dt.datetime | None = None
     last_status: str | None = None
     last_observed: str | None = None
+
+
+class SubscriberOut(BaseModel):
+    user_id: int
+    username: str
 
 
 class CheckResult(BaseModel):

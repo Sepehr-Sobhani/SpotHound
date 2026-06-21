@@ -1,4 +1,4 @@
-"""Create the admin user and the two reference targets.
+"""Bootstrap: create the admin user, sync spots into targets, subscribe admin.
 
     uv run python -m app.seed
 """
@@ -6,7 +6,7 @@ from .config import settings
 from .database import Base, SessionLocal, engine
 from .models import Subscription, Target, User
 from .security import hash_password
-from .targets_data import REFERENCE_TARGETS
+from .sync import sync_spots
 
 
 def main() -> None:
@@ -27,25 +27,21 @@ def main() -> None:
         else:
             print(f"Admin '{settings.admin_username}' already exists")
 
-        for t in REFERENCE_TARGETS:
-            if db.query(Target).filter(Target.name == t["name"]).first():
-                print(f"Target exists: {t['name']}")
-                continue
-            target = Target(
-                name=t["name"],
-                url=t["url"],
-                steps=t["steps"],
-                condition=t["condition"],
-                interval_seconds=t["interval_seconds"],
-                headless=t.get("headless", True),
-                created_by=admin.id,
+        result = sync_spots(db)
+        print(f"Synced spots: {result['created']} created, {result['updated']} updated")
+
+        # subscribe admin to every target so notifications have a recipient
+        for target in db.query(Target).all():
+            exists = (
+                db.query(Subscription)
+                .filter(Subscription.target_id == target.id, Subscription.user_id == admin.id)
+                .first()
             )
-            db.add(target)
-            db.commit()
-            db.refresh(target)
-            db.add(Subscription(target_id=target.id, user_id=admin.id))
-            db.commit()
-            print(f"Created target: {t['name']}")
+            if not exists:
+                db.add(Subscription(target_id=target.id, user_id=admin.id))
+        db.commit()
+        print("Admin subscribed to all targets.")
+        print("\nTargets are created DISABLED — turn them on via the UI/API when ready.")
     finally:
         db.close()
 

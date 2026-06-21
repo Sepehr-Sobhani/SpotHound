@@ -31,10 +31,18 @@ class Target(Base):
     __tablename__ = "targets"
 
     id = Column(Integer, primary_key=True)
+
+    # Links this row to its code-defined spot module (app/spots/<key>.py).
+    spot_key = Column(String(64), unique=True, index=True, nullable=True)
+
+    # --- definition-owned: synced from the spot module, read-only in the UI ---
     name = Column(String(200), nullable=False)
     url = Column(Text, nullable=False)
     steps = Column(JSON, nullable=False, default=list)
     condition = Column(JSON, nullable=False, default=dict)
+    headless = Column(Boolean, nullable=False, default=True)
+
+    # --- user-owned: editable in the UI, never overwritten by a spot sync ---
     interval_seconds = Column(Integer, nullable=False, default=300)
 
     # optional active window; null active_days = every day
@@ -42,8 +50,7 @@ class Target(Base):
     active_start = Column(String(5), nullable=True)  # "07:00"
     active_end = Column(String(5), nullable=True)    # "21:00"
 
-    headless = Column(Boolean, nullable=False, default=True)
-    enabled = Column(Boolean, nullable=False, default=True)
+    enabled = Column(Boolean, nullable=False, default=False)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
 
     last_checked_at = Column(DateTime, nullable=True)
