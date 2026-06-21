@@ -1,12 +1,8 @@
-"""The single execution path for every SpotHound target.
+"""Run one website check with a real browser.
 
-A real browser (Playwright) opens the page, runs a sequence of steps
-(clicks / selects / waits), then evaluates one condition. Because it drives a
-real browser with an anti-bot context, the same engine handles plain pages,
-JSON-API apps, and JavaScript sites that block headless browsers.
-
-This module depends only on Playwright so it can be exercised standalone
-(see selftest.py) without the database or web app.
+Opens the URL, runs the steps (click/select/fill/wait), evaluates one condition,
+and reports whether it's met. Depends only on Playwright, so selftest.py can run
+it without the database.
 """
 from __future__ import annotations
 
@@ -20,9 +16,8 @@ DEFAULT_UA = (
 )
 _HIDE_WEBDRIVER = "Object.defineProperty(navigator,'webdriver',{get:()=>undefined})"
 
-# Decides whether an element is "disabled" across the common patterns:
-# a native [disabled] attribute, aria-disabled="true", or a class that
-# contains "disabled" / "disbled" (some sites misspell it, e.g. Yodel).
+# An element counts as "disabled" if it has a native [disabled], aria-disabled,
+# or a class containing "disabled"/"disbled" (some sites misspell it).
 _INSPECT_JS = """
 (el) => {
   const cls = (el.className || '').toString().toLowerCase();
@@ -42,11 +37,7 @@ def run_check(
     headless: bool = True,
     nav_timeout: int = 45000,
 ) -> dict[str, Any]:
-    """Open the page, run the steps, evaluate the condition.
-
-    Returns {"met": bool, "observed": str | None, "error": str | None}.
-    `met` is True when the condition is satisfied (i.e. time to notify).
-    """
+    """Return {"met": bool, "observed": str | None, "error": str | None}."""
     steps = steps or []
     condition = condition or {}
     result: dict[str, Any] = {"met": False, "observed": None, "error": None}
@@ -65,11 +56,11 @@ def run_check(
         page = ctx.new_page()
         try:
             page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
-            page.wait_for_timeout(3000)  # let SPA fire its initial requests
+            page.wait_for_timeout(3000)  # let the SPA fire its initial requests
             for step in steps:
                 _run_step(page, step)
             result.update(_eval_condition(page, condition))
-        except Exception as exc:  # noqa: BLE001 — surface any failure as text
+        except Exception as exc:  # noqa: BLE001
             result["error"] = f"{type(exc).__name__}: {exc}"
         finally:
             browser.close()
@@ -100,8 +91,7 @@ def _run_step(page, step: dict[str, Any]) -> None:
 
 
 def _eval_condition(page, condition: dict[str, Any]) -> dict[str, Any]:
-    """Supported checks: enabled, disabled, exists, not_exists,
-    text_present, text_absent. `value` is the comparison text where relevant."""
+    """Checks: enabled, disabled, exists, not_exists, text_present, text_absent."""
     check = condition.get("check")
     selector = condition.get("selector")
     value = condition.get("value")

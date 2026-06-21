@@ -1,6 +1,6 @@
 # Roadmap & status
 
-Where SpotHound is and what's next. Keep this current.
+What's done. Detailed plan for the remaining phases is in `PLAN.md`.
 
 ## Done
 
@@ -26,22 +26,11 @@ Where SpotHound is and what's next. Keep this current.
 
 ## Next
 
-### Phase 2 — React + Tailwind UI (current focus)
-- Login screen (JWT).
-- Targets dashboard: list with status, last-checked, on/off toggle.
-- Per-target panel: scheduling (interval + active days/time), subscribers,
-  and a live **Test** button hitting `/targets/{id}/test`.
-- Admin: user management, "Sync spots" button, view of code-defined recipes.
-- Deploy target: Vercel.
+- Phase 2 — React + Tailwind UI (current focus)
+- Phase 3 — scheduling & notifications polish
+- Phase 4 — deploy (Vercel + Neon + Oracle VM)
 
-### Phase 3 — Scheduling & notifications polish
-- Richer active-window editing; per-user Telegram onboarding (capture chat id).
-- Notification history / activity feed from the `events` table.
-- Optional: re-notify cadence, quiet hours.
-
-### Phase 4 — Deploy (all free)
-- Backend Docker image (Chromium + xvfb) on Oracle Cloud Always Free VM.
-- Postgres on Neon. Frontend on Vercel. Lock CORS to the Vercel domain.
+See `PLAN.md` for the detailed task breakdown.
 
 ## Pending user actions
 - Create a Telegram bot via @BotFather → set `TELEGRAM_BOT_TOKEN` and the

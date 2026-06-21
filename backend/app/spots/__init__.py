@@ -1,8 +1,6 @@
-"""Spot registry — auto-discovers every spot module in this package.
+"""Registry that auto-discovers spot modules.
 
-Drop a new file in this directory that defines a module-level ``SPOT =
-SpotDefinition(...)`` and it is picked up automatically; no other code changes
-needed. ``app.sync.sync_spots`` then upserts each into the database.
+Any module here defining ``SPOT = SpotDefinition(...)`` is picked up automatically.
 """
 from __future__ import annotations
 
@@ -11,11 +9,10 @@ import pkgutil
 
 from .base import SpotDefinition
 
-_EXCLUDE = {"base"}
+_EXCLUDE = {"base", "render"}
 
 
 def load_spots() -> dict[str, SpotDefinition]:
-    """Return {key: SpotDefinition} for every spot module in this package."""
     spots: dict[str, SpotDefinition] = {}
     for info in pkgutil.iter_modules(__path__):
         if info.name in _EXCLUDE or info.name.startswith("_"):
@@ -25,9 +22,7 @@ def load_spots() -> dict[str, SpotDefinition]:
         if not isinstance(spot, SpotDefinition):
             continue
         if spot.key in spots:
-            raise ValueError(
-                f"Duplicate spot key {spot.key!r} (in {info.name} and another module)"
-            )
+            raise ValueError(f"Duplicate spot key {spot.key!r}")
         spots[spot.key] = spot
     return spots
 

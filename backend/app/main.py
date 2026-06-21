@@ -12,7 +12,6 @@ from .sync import sync_spots
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
-    # pick up any newly added spot modules, then start polling
     db = SessionLocal()
     try:
         sync_spots(db)

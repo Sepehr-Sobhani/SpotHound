@@ -1,7 +1,7 @@
-"""Per-target polling. Each enabled target is one APScheduler job.
+"""Per-target polling: each enabled target is one APScheduler job.
 
-Runs in background threads (BackgroundScheduler), so the synchronous Playwright
-engine is safe to call directly here without touching the FastAPI event loop.
+Jobs run in background threads, so the synchronous Playwright engine is safe to
+call directly without touching the FastAPI event loop.
 """
 import datetime as dt
 
@@ -33,7 +33,6 @@ def check_target(target_id: int) -> None:
         if not target or not target.enabled or not _within_window(target):
             return
 
-        # fill the target's date into the steps/condition before running
         steps = render(target.steps, target.target_date)
         condition = render(target.condition, target.target_date)
         if has_unresolved(steps) or has_unresolved(condition):
@@ -55,7 +54,7 @@ def check_target(target_id: int) -> None:
         target.last_status = status
         target.last_observed = result.get("error") or result.get("observed")
 
-        # only notify on the transition into "met" — avoids repeat spam
+        # notify only on the transition into "met" to avoid repeats
         notified = False
         if status == "met" and previous != "met":
             notify_subscribers(db, target)

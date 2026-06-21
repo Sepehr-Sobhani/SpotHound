@@ -10,10 +10,10 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60 * 24
 
     telegram_bot_token: str | None = None
-    headless: bool = True  # default for new targets; overridden per-target
+    headless: bool = True
 
     admin_username: str = "admin"
-    admin_password: str = "admin"  # override via env in real use
+    admin_password: str = "admin"
 
 
 settings = Settings()

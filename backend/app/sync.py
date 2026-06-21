@@ -1,11 +1,7 @@
-"""Sync code-defined spots into the database as targets.
+"""Upsert code-defined spots into target rows.
 
-Definition-owned fields (name, url, steps, condition, headless) are refreshed
-from the spot module. User-owned fields (enabled, interval, schedule,
-subscriptions) are never touched. New spots are created disabled so they don't
-start polling until a user turns them on.
-
-Run on startup and via the admin `POST /admin/sync-spots` endpoint.
+Refreshes definition fields (name/url/steps/condition/headless) and leaves
+user-managed fields untouched. New targets are created disabled.
 """
 from sqlalchemy.orm import Session
 
@@ -27,7 +23,7 @@ def sync_spots(db: Session) -> dict[str, int]:
                     condition=spot.condition,
                     headless=spot.headless,
                     interval_seconds=spot.default_interval_seconds,
-                    enabled=False,  # user turns it on
+                    enabled=False,
                 )
             )
             created += 1

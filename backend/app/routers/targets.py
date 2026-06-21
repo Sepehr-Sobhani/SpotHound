@@ -1,8 +1,7 @@
-"""Target management.
+"""Target management: list, scheduling/enabled updates, test, and subscribers.
 
-Targets are created from code-defined spots (see app/spots/ and app/sync.py),
-NOT through this API. Here users only manage existing targets: toggle on/off,
-adjust scheduling, run a live test, and manage who gets notified.
+Targets come from code-defined spots (app/sync.py); this API only manages them,
+it does not create check logic.
 """
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.concurrency import run_in_threadpool

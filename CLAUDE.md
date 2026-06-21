@@ -5,8 +5,7 @@ Guide for Claude (and humans) working in this repo. Read this first.
 ## What SpotHound is
 
 A web app that watches websites for a condition and notifies users when it's
-met (e.g. a sold-out parking pass opening up). It began as a single-purpose
-Playwright script (`../ParkingPassBot`) and is being generalized.
+met (e.g. a sold-out parking pass opening up).
 
 ## The one big idea: Spots vs Targets
 
@@ -121,10 +120,8 @@ API: `POST /auth/login` (form) → bearer token. `GET /targets`,
 `PATCH /targets/{id}` (scheduling/enabled), `POST /targets/{id}/toggle`,
 `POST /targets/{id}/test`, subscriber endpoints, `POST /admin/sync-spots`.
 
-## Status
+## Status & plan
 
-Phase 1 (backend) and the spots refactor are **done and verified**. Next is
-Phase 2 (React + Tailwind UI). See `docs/ROADMAP.md`.
-
-Pending user actions: create a Telegram bot (@BotFather) → set
-`TELEGRAM_BOT_TOKEN` + chat id; decide when to create/push the public GitHub repo.
+Backend and the spots architecture are done. Status is in `docs/ROADMAP.md`;
+the detailed plan for the remaining phases (UI, polish, deploy) is in
+`docs/PLAN.md`.

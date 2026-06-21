@@ -10,8 +10,7 @@ from .models import Subscription, Target, User
 from .security import hash_password
 from .sync import sync_spots
 
-# Convenience starting date for the reference targets (the original goal).
-# NOT part of any spot recipe — users change a target's date via the API/UI.
+# Starting date for the seeded targets; users change it via the API.
 SEED_TARGET_DATE = dt.date(2026, 6, 21)
 
 
@@ -36,13 +35,12 @@ def main() -> None:
         result = sync_spots(db)
         print(f"Synced spots: {result['created']} created, {result['updated']} updated")
 
-        # give the reference targets a starting date so they're usable out of the box
         for target in db.query(Target).all():
             if target.target_date is None:
                 target.target_date = SEED_TARGET_DATE
         db.commit()
 
-        # subscribe admin to every target so notifications have a recipient
+        # subscribe admin so notifications have a recipient
         for target in db.query(Target).all():
             exists = (
                 db.query(Subscription)

@@ -32,31 +32,26 @@ class Target(Base):
     __tablename__ = "targets"
 
     id = Column(Integer, primary_key=True)
-
-    # Links this row to its code-defined spot module (app/spots/<key>.py).
     spot_key = Column(String(64), unique=True, index=True, nullable=True)
 
-    # --- definition-owned: synced from the spot module, read-only in the UI ---
+    # Synced from the spot definition (see sync.py); read-only via the API.
     name = Column(String(200), nullable=False)
     url = Column(Text, nullable=False)
     steps = Column(JSON, nullable=False, default=list)
     condition = Column(JSON, nullable=False, default=dict)
     headless = Column(Boolean, nullable=False, default=True)
 
-    # --- user-owned: editable in the UI, never overwritten by a spot sync ---
-    target_date = Column(Date, nullable=True)  # the date this target watches
+    # User-managed; never overwritten by a spot sync.
+    target_date = Column(Date, nullable=True)
     interval_seconds = Column(Integer, nullable=False, default=300)
-
-    # optional active window; null active_days = every day
-    active_days = Column(JSON, nullable=True)        # list[int], 0=Mon .. 6=Sun
+    active_days = Column(JSON, nullable=True)        # list[int], 0=Mon .. 6=Sun; null = every day
     active_start = Column(String(5), nullable=True)  # "07:00"
     active_end = Column(String(5), nullable=True)    # "21:00"
-
     enabled = Column(Boolean, nullable=False, default=False)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
 
     last_checked_at = Column(DateTime, nullable=True)
-    last_status = Column(String(16), nullable=True)  # met | not_met | error
+    last_status = Column(String(16), nullable=True)  # met | not_met | error | needs_date
     last_observed = Column(Text, nullable=True)
     created_at = Column(DateTime, default=dt.datetime.utcnow)
 
@@ -66,8 +61,6 @@ class Target(Base):
 
 
 class Subscription(Base):
-    """Which users get notified for which target."""
-
     __tablename__ = "subscriptions"
     __table_args__ = (UniqueConstraint("target_id", "user_id", name="uq_target_user"),)
 
@@ -80,13 +73,11 @@ class Subscription(Base):
 
 
 class Event(Base):
-    """History of checks — useful for debugging and an activity feed."""
-
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True)
     target_id = Column(Integer, ForeignKey("targets.id"), nullable=False)
     timestamp = Column(DateTime, default=dt.datetime.utcnow)
-    status = Column(String(16), nullable=False)  # met | not_met | error
+    status = Column(String(16), nullable=False)  # met | not_met | error | needs_date
     observed = Column(Text, nullable=True)
     notified = Column(Boolean, default=False)

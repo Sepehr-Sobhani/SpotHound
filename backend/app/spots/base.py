@@ -1,42 +1,32 @@
-"""The shape of a spot definition.
+"""Definition of a spot: the URL, browser steps, and condition for one check.
 
-A *spot* is a code-defined recipe for checking one thing on one site: the URL,
-the browser steps to reach the state, and the single condition that means
-"available". Spots are authored by a developer (with Claude) — see
-docs/ADDING_A_SPOT.md. End users never edit these; they only manage the
-*targets* (DB rows) these definitions create: on/off, schedule, subscribers.
+See docs/ADDING_A_SPOT.md for how to add one.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 
 @dataclass(frozen=True)
 class SpotDefinition:
-    # Stable unique id, snake_case, also the module filename. NEVER rename —
-    # it's the link between this code and its DB row.
+    # Stable unique id (also the module filename); never rename — it links to
+    # the target row in the database.
     key: str
-
-    # Human-friendly label shown in the UI.
     name: str
-
     url: str
 
-    # steps/condition may contain {date:<strftime>} tokens (e.g.
-    # {date:%A, %B %-d, %Y}); they're rendered per-target with the target's date.
+    # May contain {date:<strftime>} tokens, rendered per-target by render.py.
     steps: list[dict[str, Any]]
     condition: dict[str, Any]
 
-    # Whether this spot needs a target_date to render its tokens. A dated target
-    # won't run until its date is set.
+    # If True, the target needs a date set before it can run.
     requires_date: bool = True
 
-    # Used only when the target row is first created; users tune it afterwards.
     default_interval_seconds: int = 300
 
-    # headful (headless=False) is required for sites with bot detection.
+    # headless=False is required for sites with bot detection.
     headless: bool = True
 
-    # Free-form: how this recipe was derived, selectors, gotchas, fragility.
+    # How this recipe was derived; selectors and gotchas.
     notes: str = ""
